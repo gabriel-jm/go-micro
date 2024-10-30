@@ -11,6 +11,10 @@
                     Test Broker
                 </button>
 
+                <button id="authBtn" class="btn btn-outline-secondary">
+                    Test Auth
+                </button>
+
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -47,6 +51,38 @@
                     
                     if (data.error) {
                         console.log(`Error: ${data.message}`)
+                    } else {
+                        output.innerHTML += `<br/><strong>Response from broker service:</strong> ${data.message}`
+                    }
+                })
+                .catch(err => {
+                    output.innerHTML += `<br/><br/>Error: ${err}`
+                })
+        })
+
+        authBtn.addEventListener("click", () => {
+            const body = {
+                action: "auth",
+                auth: {
+                    email: "admin@example.com",
+                    password: "verysecret"
+                }
+            }
+
+            fetch("http:\/\/localhost:8080/handle", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    payload.innerHTML = JSON.stringify(body, null, 2)
+                    received.innerHTML = JSON.stringify(data, null, 2)
+                    
+                    if (data.error) {
+                        output.innerHTML += `<br/><strong>Error:</strong> ${data.message}`
                     } else {
                         output.innerHTML += `<br/><strong>Response from broker service:</strong> ${data.message}`
                     }
