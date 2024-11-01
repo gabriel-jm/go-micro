@@ -45,10 +45,11 @@ func main() {
 		Models: data.New(mongoClient),
 	}
 
-	go app.serve()
+	app.serve()
 }
 
 func (app *Config) serve() {
+	log.Println("Starting log server on port:", webPort)
 	server := http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
