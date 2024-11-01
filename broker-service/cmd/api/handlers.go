@@ -84,7 +84,7 @@ func (app *Config) authenticate(w http.ResponseWriter, payload AuthPayload) {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		log.Printf("[Auth] Response body: %d", jsonFromService)
+		log.Printf("[Auth] Response body: %v", jsonFromService)
 		app.errorJSON(w, errors.New(jsonFromService.Message))
 		return
 	}
