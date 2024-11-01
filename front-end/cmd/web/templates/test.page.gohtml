@@ -15,6 +15,10 @@
                     Test Auth
                 </button>
 
+                <button id="logBtn" class="btn btn-outline-secondary">
+                    Test Logger
+                </button>
+
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -39,57 +43,58 @@
 
 {{define "js"}}
     <script>
-        brokerBtn.addEventListener("click", () => {
-            const body = {
-                method: "POST"
-            }
-            fetch("http:\/\/localhost:8080", body)
-                .then(response => response.json())
-                .then(data => {
-                    payload.innerHTML = "Empty post request"
-                    received.innerHTML = JSON.stringify(data, null, 2)
-                    
-                    if (data.error) {
-                        console.log(`Error: ${data.message}`)
-                    } else {
-                        output.innerHTML += `<br/><strong>Response from broker service:</strong> ${data.message}`
-                    }
-                })
-                .catch(err => {
-                    output.innerHTML += `<br/><br/>Error: ${err}`
-                })
-        })
+        brokerBtn.addEventListener("click", handleRequest())
 
-        authBtn.addEventListener("click", () => {
-            const body = {
+        authBtn.addEventListener("click", handleRequest({
+            url: "/handle",
+            body: {
                 action: "auth",
                 auth: {
                     email: "admin@example.com",
                     password: "verysecret"
                 }
             }
+        }))
 
-            fetch("http:\/\/localhost:8080/handle", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    payload.innerHTML = JSON.stringify(body, null, 2)
-                    received.innerHTML = JSON.stringify(data, null, 2)
-                    
-                    if (data.error) {
-                        output.innerHTML += `<br/><strong>Error:</strong> ${data.message}`
-                    } else {
-                        output.innerHTML += `<br/><strong>Response from broker service:</strong> ${data.message}`
-                    }
+        logBtn.addEventListener("click", handleRequest({
+            url: "/handle",
+            body: {
+                action: "log",
+                log: {
+                    name: "event",
+                    data: "Some kind of data"
+                }
+            }
+        }))
+
+        function handleRequest(config = {}) {
+            return () => {
+                fetch(`http:\/\/localhost:8080${config.url ?? ''}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: config.body && JSON.stringify(config.body)
                 })
-                .catch(err => {
-                    output.innerHTML += `<br/><br/>Error: ${err}`
-                })
-        })
+                    .then(response => response.json())
+                    .then(data => {
+                        payload.innerHTML = config.body
+                            ? JSON.stringify(config.body, null, 2)
+                            : "<Empty Post Request>"
+                        received.innerHTML = JSON.stringify(data, null, 2)
+                        
+                        if (data.error) {
+                            output.innerHTML += `<br/><strong>Error:</strong> ${data.message}`
+                        } else {
+                            output.innerHTML += (
+                                `<br/><strong>Response from service:</strong> ${data.message}`
+                            )
+                        }
+                    })
+                    .catch(err => {
+                        output.innerHTML += `<br/><br/>Error: ${err}`
+                    })
+            }
+        }
     </script>
 {{end}}
