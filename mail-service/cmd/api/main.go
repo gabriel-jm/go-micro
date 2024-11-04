@@ -6,12 +6,16 @@ import (
 	"net/http"
 )
 
-type Config struct{}
+type Config struct {
+	Mailer Mail
+}
 
 const webPort = "8000"
 
 func main() {
-	app := Config{}
+	app := Config{
+		Mailer: createMail(),
+	}
 
 	log.Println("Starting mail serving on port:", app)
 	server := &http.Server{
