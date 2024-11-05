@@ -126,7 +126,7 @@ func (m *Mail) buildHTTPMessage(msg Message) (string, error) {
 
 	var tpl bytes.Buffer
 
-	if err = t.ExecuteTemplate(&tpl, "body", msg.Data); err != nil {
+	if err = t.ExecuteTemplate(&tpl, "body", msg.DataMap); err != nil {
 		return "", err
 	}
 
@@ -173,7 +173,7 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 
 	var tpl bytes.Buffer
 
-	if err = t.ExecuteTemplate(&tpl, "body", msg.Data); err != nil {
+	if err = t.ExecuteTemplate(&tpl, "body", msg.DataMap); err != nil {
 		return "", err
 	}
 

@@ -180,16 +180,15 @@ func (app *Config) sendMail(w http.ResponseWriter, reqPayload MailPayload) {
 		return
 	}
 
-	defer response.Body.Close()
+	var data struct{}
+	json.NewDecoder(response.Body).Decode(&data)
 
-	if response.StatusCode != http.StatusAccepted {
-		app.errorJSON(w, errors.New("error calling mail service"))
-		return
-	}
+	defer response.Body.Close()
 
 	payload := jsonResponse{
 		Error:   false,
 		Message: "Mail send to " + reqPayload.To,
+		Data:    data,
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)

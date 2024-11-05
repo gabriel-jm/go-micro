@@ -19,6 +19,10 @@
                     Test Logger
                 </button>
 
+                <button id="mailBtn" class="btn btn-outline-secondary">
+                    Test Mail
+                </button>
+
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -63,6 +67,19 @@
                 log: {
                     name: "event",
                     data: "Some kind of data"
+                }
+            }
+        }))
+
+        mailBtn.addEventListener("click", handleRequest({
+            url: "/handle",
+            body: {
+                action: "mail",
+                mail: {
+                    from: "me@email.com",
+                    to: "you@email.com",
+                    subject: "Test email",
+                    Message: "Hello World!"
                 }
             }
         }))
