@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/rpc"
 )
 
 type RequestPayload struct {
@@ -57,7 +58,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, reqPayload.Auth)
 	case "log":
-		app.logItem(w, reqPayload.Log)
+		app.logItemRPC(w, reqPayload.Log)
 	case "mail":
 		app.sendMail(w, reqPayload.Mail)
 	default:
@@ -122,7 +123,7 @@ func (app *Config) authenticate(w http.ResponseWriter, payload AuthPayload) {
 	app.writeJSON(w, http.StatusOK, responsePayload)
 }
 
-func (app *Config) logItemHTTP(w http.ResponseWriter, logPayload LogPayload) {
+func (app *Config) _logItemHTTP(w http.ResponseWriter, logPayload LogPayload) {
 	jsonData, _ := json.MarshalIndent(logPayload, "", "\t")
 
 	logServiceURL := "http://logger-service:8000/log"
@@ -159,7 +160,7 @@ func (app *Config) logItemHTTP(w http.ResponseWriter, logPayload LogPayload) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
-func (app *Config) logItem(w http.ResponseWriter, logPayload LogPayload) {
+func (app *Config) _logItemViaRabbitMQ(w http.ResponseWriter, logPayload LogPayload) {
 	err := app.pushToQueue(logPayload.Name, logPayload.Data)
 
 	if err != nil {
@@ -170,6 +171,36 @@ func (app *Config) logItem(w http.ResponseWriter, logPayload LogPayload) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: "logged via RabbitMQ",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
+func (app *Config) logItemRPC(w http.ResponseWriter, logPayload LogPayload) {
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	rpcPayload := RPCPayload(logPayload)
+
+	var result string
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: result,
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)

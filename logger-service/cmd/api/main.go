@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,11 +29,14 @@ type Config struct {
 }
 
 func main() {
-	mongoClient, err := connectToMongo()
+	client, err := connectToMongo()
 
 	if err != nil {
-		log.Panic(err)
+		log.Println("Error Connecting to Mongo", err)
+		os.Exit(1)
 	}
+
+	mongoClient = client
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
