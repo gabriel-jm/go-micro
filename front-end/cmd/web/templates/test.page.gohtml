@@ -23,6 +23,10 @@
                     Test Mail
                 </button>
 
+                <button id="logGRPCBtn" class="btn btn-outline-secondary">
+                    Test Log with GRPC
+                </button>
+
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
                 </div>
@@ -80,6 +84,17 @@
                     to: "you@email.com",
                     subject: "Test email",
                     Message: "Hello World!"
+                }
+            }
+        }))
+
+        logGRPCBtn.addEventListener("click", handleRequest({
+            url: "/log-grpc",
+            body: {
+                action: "log",
+                log: {
+                    name: "event",
+                    data: "Some kind of gRPC data"
                 }
             }
         }))
