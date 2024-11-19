@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+  caddy:
+    image: gabrieljosem/micro-caddy:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
   front-end:
     image: gabrieljosem/front-end:1.0.1
     deploy:
@@ -86,3 +98,8 @@ services:
       POSTGRES_DB: users
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
