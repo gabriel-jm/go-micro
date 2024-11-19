@@ -14,10 +14,12 @@ services:
       - caddy_config:/config
 
   front-end:
-    image: gabrieljosem/front-end:1.0.1
+    image: gabrieljosem/front-end:1.0.2
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      BROKER_URL: http://backend
   
   broker-service:
     image: gabrieljosem/broker-service:1.0.1

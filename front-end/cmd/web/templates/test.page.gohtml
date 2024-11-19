@@ -101,7 +101,7 @@
 
         function handleRequest(config = {}) {
             return () => {
-                fetch(`http:\/\/localhost:8080${config.url ?? ''}`, {
+                fetch({{.BrokerURL}} + (config.url ?? ''), {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
