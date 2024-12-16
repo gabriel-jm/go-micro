@@ -30,7 +30,7 @@ func (p PostgresTestRepository) GetByEmail(email string) (*User, error) {
 		}
 	}
 
-	return nil, errors.New("User not found")
+	return &User{}, nil
 }
 
 func (p PostgresTestRepository) GetOne(id int) (*User, error) {
@@ -107,5 +107,5 @@ func (p PostgresTestRepository) PasswordMatches(plainText string, user *User) (b
 		}
 	}
 
-	return false, errors.New("User not found")
+	return true, nil
 }
